@@ -1,4 +1,3 @@
-import public_parsing_ops
 import tensorflow as tf
 import numpy as np
 import logging
@@ -8,14 +7,6 @@ import sentencepiece as sentencepiece_processor
 
 # python test_example.py --article cnn.txt --model_dir model/cnn_dailymail/ --model_name cnn_dailymail
 # python test_example.py --article cnn.txt --model_dir model/gigaword/ --model_name gigaword
-
-_SPM_VOCAB = 'ckpt/c4.unigram.newline.10pct.96000.model'
-encoder = public_parsing_ops.create_text_encoder("sentencepiece",
-                                                 _SPM_VOCAB)
-shapes = {
-    'cnn_dailymail': (1024, 128),
-    'gigaword':(128, 32)
-}
 
 _SHIFT_RESERVED_TOKENS = 103
 _NEWLINE_SYMBOL = "<n>"
@@ -91,6 +82,13 @@ def ids2str(encoder, ids, num_reserved):
 
 
 if __name__ == '__main__':
+    _SPM_VOCAB = 'ckpt/c4.unigram.newline.10pct.96000.model'
+    encoder = create_text_encoder("sentencepiece", _SPM_VOCAB)
+    shapes = {
+        'cnn_dailymail': (1024, 128),
+        'gigaword': (128, 32)
+    }
+
     import argparse
 
     tf.get_logger().setLevel(logging.ERROR)
