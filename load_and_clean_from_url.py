@@ -38,6 +38,7 @@ def _read_urllib(url):
     page = requests.get(url)
     soup = bs.BeautifulSoup(page.content, 'html.parser')
 
+    article = ""
     parsed_article = bs.BeautifulSoup(article, 'lxml')
 
     paragraphs = parsed_article.find_all('p')
@@ -51,6 +52,7 @@ def _read_urllib(url):
 
 if __name__ == '__main__':
 
+    a = 0
     # TODO return the top n least important lines and prompt the user should I include these in the article
     # or something like that
 
@@ -66,6 +68,6 @@ if __name__ == '__main__':
     # print(clean_text)
     #
     # print("\n\nWSJ:\n\n", run_summarization(clean_text))
-    #cnn = 'https://www.cnn.com/2020/02/04/politics/state-of-the-union-highlights-takeaways/index.html'
+    # cnn = 'https://www.cnn.com/2020/02/04/politics/state-of-the-union-highlights-takeaways/index.html'
     #_read_urllib(cnn)
 

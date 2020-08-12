@@ -5,18 +5,11 @@ from typing import List
 import sentencepiece as sentencepiece_processor
 
 
-# python test_example.py --article cnn.txt --model_dir model/cnn_dailymail/ --model_name cnn_dailymail
-# python test_example.py --article cnn.txt --model_dir model/gigaword/ --model_name gigaword
-
-_SHIFT_RESERVED_TOKENS = 103
-_NEWLINE_SYMBOL = "<n>"
-
-
 def create_text_encoder(encoder_type: str, vocab_filename: str):
   if encoder_type == "sentencepiece":
     return SentencePieceEncoder(vocab_filename)
   elif encoder_type == "sentencepiece_newline":
-    return SentencePieceEncoder(vocab_filename, newline_symbol=_NEWLINE_SYMBOL)
+    return SentencePieceEncoder(vocab_filename, newline_symbol="<n>")
   else:
     raise ValueError("Unsupported encoder type: %s" % encoder_type)
 
@@ -31,7 +24,7 @@ class SentencePieceEncoder(object):
 
   def __init__(self,
                sentencepiece_model_file: str,
-               shift_reserved_tokens: int = _SHIFT_RESERVED_TOKENS,
+               shift_reserved_tokens: int = 103,
                newline_symbol: str = ""):
     self._tokenizer = sentencepiece_processor.SentencePieceProcessor()
     self._sp_model = tf.io.gfile.GFile(sentencepiece_model_file, "rb").read()
@@ -81,7 +74,8 @@ def ids2str(encoder, ids, num_reserved):
   return encoder.decode(ids.flatten().tolist())
 
 
-if __name__ == '__main__':
+def run_summarization(text, model_name='cnn_dailymail', model_dir='model/cnn_dailymail/'):
+
     _SPM_VOCAB = 'ckpt/c4.unigram.newline.10pct.96000.model'
     encoder = create_text_encoder("sentencepiece", _SPM_VOCAB)
     shapes = {
@@ -89,18 +83,9 @@ if __name__ == '__main__':
         'gigaword': (128, 32)
     }
 
-    import argparse
-
     tf.get_logger().setLevel(logging.ERROR)
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--article", help="path of your example article", default="example_article")
-    parser.add_argument("--model_dir", help="path of your model directory", default="model/")
-    parser.add_argument("--model_name", help="path of your model directory", default="cnn_dailymail")
-    args = parser.parse_args()
 
-    text = "Partisanship at every turn: On the same day a new Gallup poll came out showing an 84-point gap between Republican and Democratic approval of Trump, the bitter divide in Congress -- and the country -- was visible everywhere during the President's speech." #open(args.article, "r", encoding="utf-8").read()
-
-    shape,_ = shapes[args.model_name]
+    shape,_ = shapes[model_name]
 
     input_ids = encoder.encode(text)
     inputs = np.zeros(shape)
@@ -108,9 +93,49 @@ if __name__ == '__main__':
     if idx>shape: idx =shape
 
     inputs[:idx] = input_ids[:idx]
-    imported = tf.saved_model.load(args.model_dir, tags='serve')
+    imported = tf.saved_model.load(model_dir, tags='serve')
     example = tf.train.Example()
     example.features.feature["inputs"].int64_list.value.extend(inputs.astype(int))
     output = imported.signatures['serving_default'](examples=tf.constant([example.SerializeToString()]))
+    prediction = ids2str(encoder, output['outputs'].numpy(), None)
 
-    print("\nPREDICTION >> ", ids2str(encoder, output['outputs'].numpy(), None))
+    return prediction
+
+
+def part_by_part_summarization(text, model_name='cnn_dailymail', model_dir='model/cnn_dailymail/'):
+    """
+
+    :param text:
+    :param part_size: Number of sentences you want to summarize at a time
+    :param model_name:
+    :param model_dir:
+    :return:
+    """
+
+    # split on paragraphs
+    paragraphs = text.split('\n')
+
+    summary = ""
+
+    chunk_to_summarize = ""
+    for paragraph in paragraphs:
+        chunk_to_summarize += paragraph
+
+        # if there are less than 100 words in the paragraph also grab the next paragraph
+        if len(chunk_to_summarize.split(' ')) < 100:
+            continue
+        else:
+            summary += run_summarization(text=chunk_to_summarize, model_name=model_name, model_dir=model_dir)
+            chunk_to_summarize = ""
+
+    return summary
+
+
+if __name__ == '__main__':
+
+    file = open("cnn.txt", "r")
+    article = file.read()
+    file.close()
+
+    print(part_by_part_summarization(article))
+    #print(run_summarization(article))
