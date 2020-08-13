@@ -122,10 +122,10 @@ def part_by_part_summarization(text, model_name='cnn_dailymail', model_dir='mode
         chunk_to_summarize += paragraph
 
         # if there are less than 100 words in the paragraph also grab the next paragraph
-        if len(chunk_to_summarize.split(' ')) < 100:
+        if len(chunk_to_summarize.split(' ')) < 75:
             continue
         else:
-            summary += run_summarization(text=chunk_to_summarize, model_name=model_name, model_dir=model_dir)
+            summary += '. ' + run_summarization(text=chunk_to_summarize, model_name=model_name, model_dir=model_dir)
             chunk_to_summarize = ""
 
     return summary
@@ -137,5 +137,5 @@ if __name__ == '__main__':
     article = file.read()
     file.close()
 
-    print(part_by_part_summarization(article))
+    print(part_by_part_summarization(article, model_name='gigaword', model_dir='model/gigaword/'))
     #print(run_summarization(article))

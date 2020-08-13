@@ -1,6 +1,8 @@
 selenium
 nltk
+textblob
 numpy
+flair
 sentencepiece
 tfds-nightly
 #tensorflow-gpu==2.2.0
