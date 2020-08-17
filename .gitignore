@@ -1,3 +1,5 @@
 *.idea*
 *chromedriver*
 model/*
+*__pycache__*
+*.ipynb_checkpoints*

@@ -112,6 +112,8 @@ def part_by_part_summarization(text, model_name='cnn_dailymail', model_dir='mode
     :return:
     """
 
+
+    # TODO this needs to be a split on every 5 sentences or so. (use NLTK sentence tokenizer)
     # split on paragraphs
     paragraphs = text.split('\n')
 

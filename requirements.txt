@@ -3,6 +3,7 @@ nltk
 textblob
 numpy
 flair
+gensim
 sentencepiece
 tfds-nightly
 #tensorflow-gpu==2.2.0
