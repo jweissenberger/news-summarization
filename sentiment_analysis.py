@@ -1,29 +1,7 @@
 import flair
 from textblob import TextBlob
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-from nltk.tokenize import sent_tokenize
-
-
-def sentence_tokenizer(text):
-    """
-    Sentence tokenizer
-    :param text:
-    :return: list of sentences
-    """
-    text = text.replace('*', '')
-    text = text.replace('-', '')
-    text = text.replace('#', '')
-    sentences = sent_tokenize(text)
-
-    output = []
-    for sentence in sentences:
-        # remove super short sentences (usually titles or numbers or something
-        if len(sentence) < 8:
-            continue
-        else:
-            output.append(sentence)
-
-    return output
+from common import sentence_tokenizer
 
 
 def flair_sentiment_analysis(text):
@@ -69,8 +47,22 @@ def flair_sentence_by_sentence_sentiment_analysis(text):
 
 
 def flair_average_sentiment(text):
-    # TODO average the sentiment out of sentence by
-    assert 0
+    positive_sentences, negative_sentences = flair_sentence_by_sentence_sentiment_analysis(text)
+
+    pos = 0
+    neg = 0
+    for i in positive_sentences:
+        pos += i[0]
+    pos = pos/len(positive_sentences)
+
+    for j in negative_sentences:
+        neg += j[0]
+    neg = neg/len(negative_sentences)
+
+    output = pos - neg
+
+    print("This will be on a scale from 1 (very positive) to -1 (very negative)")
+    return output
 
 
 def flair_topn_sentiment(text, num_sentences=3):
@@ -80,7 +72,6 @@ def flair_topn_sentiment(text, num_sentences=3):
     top_negative = neg_sentences[-num_sentences:]
 
     return top_positive, top_negative
-
 
 
 def textblob_sentiment_analysis(text):
@@ -98,17 +89,63 @@ def textblob_sentiment_analysis(text):
     return TextBlob(text).sentiment.polarity
 
 
+def textblob_sentence_by_sentence_sentiment_analysis(text):
+
+    sentences = sentence_tokenizer(text)
+
+    output = []
+    for sent in sentences:
+        score = textblob_sentiment_analysis(sent)
+
+        output.append((score, sent))
+
+    output = sorted(output, key=lambda x: x[0])
+
+    return output
+
+
+def textblob_topn_sentiment(text, num_sentences=3):
+
+    sentence_sentiment = textblob_sentence_by_sentence_sentiment_analysis(text)
+
+    positive_sentences = sentence_sentiment[-num_sentences:]
+    negative_sentences = sentence_sentiment[:num_sentences]
+
+    return positive_sentences, negative_sentences
+
+
 def nltk_sentiment_analysis(text):
     """
 
     :param text:
-    :return: dict with keys 'neg'(negative), 'neu'(neutral), 'pos'(positive) and 'compound'(think is totaly)
+    :return: dict with keys 'neg'(negative), 'neu'(neutral), 'pos'(positive) and 'compound'
     Assume all are on a scale of 0-1
     compound is 0 negative to 1 positive
     """
-    # nltk.download('vader_lexicon')
+
     sid = SentimentIntensityAnalyzer()
     return sid.polarity_scores(text)
+
+
+def nltk_sentence_by_sentence_sentiment_analysis(text):
+
+    sentences = sentence_tokenizer(text)
+
+    output = []
+    for sent in sentences:
+        score = nltk_sentiment_analysis(sent)
+
+        output.append((score, sent))
+
+    return output
+
+
+def nltk_topn_sentiment(text):
+
+
+
+
+
 
 
 if __name__ == '__main__':

@@ -1,7 +1,7 @@
 from textblob import TextBlob
 from nltk.sentiment.util import demo_sent_subjectivity
 
-from sentiment_analysis import sentence_tokenizer
+from common import sentence_tokenizer
 
 
 def textblob_subjectivity_analysis(text):
@@ -31,13 +31,17 @@ def textblob_sentence_by_sentence_subjectivity(text):
 
     return output
 
-def
 
+def textblob_topn_subjectivity(text, num_sentences=3):
 
+    sentence_subjectivity = textblob_sentence_by_sentence_subjectivity(text)
 
+    most_subjective = sentence_subjectivity[-num_sentences:]
+    least_subjective = sentence_subjectivity[:num_sentences]
+
+    return most_subjective, least_subjective
 
 
 def nltk_subjectivity_analysis(text):
-    #nltk.download('subjectivity')
     # TODO
-    assert 0
+    raise NotImplementedError
