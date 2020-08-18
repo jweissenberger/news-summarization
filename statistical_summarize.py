@@ -1,6 +1,7 @@
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.tokenize import word_tokenize
+from common import sentence_tokenizer
 import math
 
 
@@ -184,7 +185,7 @@ def run_word_frequency_summarization(text, num_sentences):
     freq_table = _create_frequency_table(text)
 
     # Tokenize the sentences
-    sentences = sent_tokenize(text)
+    sentences = sentence_tokenizer(text)
 
     # Important Algorithm: score the sentences
     sentence_scores = _score_sentences_frequency(sentences, freq_table)
@@ -202,7 +203,7 @@ def run_tf_idf_summarization(text, num_sentences):
     """
 
     # Sentence Tokenize
-    sentences = sent_tokenize(text)
+    sentences = sentence_tokenizer(text)
     total_documents = len(sentences)
 
     # Create the Frequency matrix of the words in each sentence.
@@ -230,6 +231,16 @@ def run_tf_idf_summarization(text, num_sentences):
     return summary
 
 
+def run_statistical_summarizers(text, num_sentences=10):
+    print("**********Statistical Summarizations**********\n\n")
+
+    print("TF IDF Summary:")
+    print(run_tf_idf_summarization(text, num_sentences=num_sentences))
+
+    print("\n\nWord Frequency Summary:")
+    print(run_word_frequency_summarization(text, num_sentences=num_sentences), "\n\n")
+
+
 if __name__ == '__main__':
 
     # TODO create a clean text function that removes * and such
@@ -238,5 +249,4 @@ if __name__ == '__main__':
     article = file.read()
     file.close()
 
-    print('\n\n\nWord Frequency Summary:\n\n', run_word_frequency_summarization(article, 10))
-    print('\n\n\nTF IDF Summary:\n\n', run_tf_idf_summarization(article, 10), '\n\n')
+    run_statistical_summarizers(article)

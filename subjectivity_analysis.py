@@ -45,3 +45,31 @@ def textblob_topn_subjectivity(text, num_sentences=3):
 def nltk_subjectivity_analysis(text):
     # TODO
     raise NotImplementedError
+
+
+def run_subjectivity(text, num_sentences=3):
+
+    print("******************Full Subjectivity Analysis******************\n\n")
+
+    most_subjective, least_subjective = textblob_topn_subjectivity(text, num_sentences=num_sentences)
+
+    print("Most Subjective:\n")
+    for i in reversed(most_subjective):
+        print("Score:", i[0])
+        print(f"Sentence:\n{i[1]}\n")
+
+    print("\n\n*********")
+    print("Least Subjective:")
+    for i in least_subjective:
+        print("Score:", i[0])
+        print(f"Sentence:\n{i[1]}\n")
+
+
+if __name__ == '__main__':
+
+
+    file = open("fox.txt", "r")
+    fox = file.read()
+    file.close()
+
+    run_subjectivity(fox, num_sentences=3)

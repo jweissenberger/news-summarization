@@ -14,7 +14,7 @@ def sentence_tokenizer(text):
 
     output = []
     for sentence in sentences:
-        # remove super short sentences (usually titles or numbers or something
+        # remove super short sentences (usually titles or numbers or something)
         if len(sentence) < 8:
             continue
         else:

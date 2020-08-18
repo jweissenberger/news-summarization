@@ -4,18 +4,23 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from common import sentence_tokenizer
 
 
-def flair_sentiment_analysis(text):
+def flair_sentiment_analysis(text, model=None):
     """
     Measures how positive or negative the sentiment of the article is
 
     Seems to rate neutral sentences as positive
 
     :param text:
+    :param model:
     :return:
     pos_or_neg: string 'POSITIVE' or 'NEGATIVE'
     score: value from 0.0 to 1 on how positive or negative
     """
-    flair_sentiment = flair.models.TextClassifier.load('en-sentiment')
+
+    if not model:
+        flair_sentiment = flair.models.TextClassifier.load('en-sentiment')
+    else:
+        flair_sentiment = model
 
     s = flair.data.Sentence(text)
     flair_sentiment.predict(s)
@@ -31,9 +36,10 @@ def flair_sentence_by_sentence_sentiment_analysis(text):
 
     positive_sentences = []
     negative_sentences = []
+    flair_sentiment = flair.models.TextClassifier.load('en-sentiment')
 
     for sentence in sentences:
-        positive_or_negative, score = flair_sentiment_analysis(sentence)
+        positive_or_negative, score = flair_sentiment_analysis(sentence, model=flair_sentiment)
 
         if positive_or_negative == 'POSITIVE':
             positive_sentences.append((score, sentence))
@@ -61,7 +67,6 @@ def flair_average_sentiment(text):
 
     output = pos - neg
 
-    print("This will be on a scale from 1 (very positive) to -1 (very negative)")
     return output
 
 
@@ -140,45 +145,78 @@ def nltk_sentence_by_sentence_sentiment_analysis(text):
     return output
 
 
-def nltk_topn_sentiment(text):
+def nltk_topn_sentiment(text, num_sentences=3):
+
+    scores_and_sentences = nltk_sentence_by_sentence_sentiment_analysis(text)
+
+    top_positive = sorted(scores_and_sentences, key=lambda x: x[0]['pos'])[-num_sentences:]
+    top_negative = sorted(scores_and_sentences, key=lambda x: x[0]['neg'])[-num_sentences:]
+    top_neutral = sorted(scores_and_sentences, key=lambda x: x[0]['neu'])[-num_sentences:]
+
+    return top_positive, top_negative, top_neutral
 
 
+def run_sentiment_analysis(text, num_sentences=3):
 
+    print("\n\n************Full Sentiment Analysis************\n\n")
+    print('\n\nTechnique 1: Flair\n')
+    flair_top_positive, flair_top_negative = flair_topn_sentiment(text, num_sentences=num_sentences)
+    print("Top Positive Sentences:")
+    for i in reversed(flair_top_positive):
+        print("Score:", i[0])
+        print(f"Sentence:\n{i[1]}")
 
+    print("\n\n*********")
+    print("Top Negative Sentences:")
 
+    for i in reversed(flair_top_negative):
+        print("Score:", i[0])
+        print(f"Sentence:\n{i[1]}")
+
+    print("\n\n***********************************************\n\n")
+    print('Technique 2: Textblob\n')
+    textb_positive_sentences, textb_negative_sentences = textblob_topn_sentiment(text, num_sentences=num_sentences)
+
+    for i in reversed((textb_positive_sentences)):
+        print("Score:", i[0])
+        print(f"Sentence:\n{i[1]}")
+
+    print("\n\n*********")
+    print("Top Negative Sentences:")
+
+    for i in textb_negative_sentences:
+        print("Score:", i[0])
+        print(f"Sentence:\n{i[1]}")
+
+    print("\n\n***********************************************\n\n")
+    print('Technique 3: NLTK\n')
+    print("This technique returns 3 scores, Negative, Positive and Neutral\n")
+    nltk_top_positive, nltk_top_negative, nltk_top_neutral = nltk_topn_sentiment(text, num_sentences=num_sentences)
+    print("Top Positive Sentences:")
+    for i in reversed(nltk_top_positive):
+        print(f"Positive Score: {i[0]['pos']}, Negative Score: {i[0]['neg']}, Neutral Score: {i[0]['neu']}")
+        print(f"Sentence:\n{i[1]}\n")
+
+    print("\n\n*********")
+    print("Top Negative Sentences:")
+    for i in reversed(nltk_top_negative):
+        print(f"Positive Score: {i[0]['pos']}, Negative Score: {i[0]['neg']}, Neutral Score: {i[0]['neu']}")
+        print(f"Sentence:\n{i[1]}\n")
+
+    print("\n\n*********")
+    print("Top Neutral Sentences:")
+    for i in reversed(nltk_top_neutral):
+        print(f"Positive Score: {i[0]['pos']}, Negative Score: {i[0]['neg']}, Neutral Score: {i[0]['neu']}")
+        print(f"Sentence:\n{i[1]}\n")
 
 
 if __name__ == '__main__':
 
-    # file = open("cnn.txt", "r")
-    # cnn = file.read()
-    # file.close()
-    #
+
     file = open("fox.txt", "r")
     fox = file.read()
     file.close()
 
-
-    top_p, top_n = flair_topn_sentiment(fox)
-    print("\n\npositive:\n", top_p)
-    print("\n\n\nnegative\n", top_n)
-
-    # print('\n\nPositive example:')
-    # sent = 'The night was filled with dozens of standing ovations and cheers from Republican supporters of Trump' #fox.split('/n')[0]
-    # print(sent)
-    # out = nltk_sentiment_analysis(sent)
-    # print(out)
-    #
-    # print('\n\nNegative example:')
-    # sent = "In one final gesture of division between Democrats and Republicans, Pelosi stood at the end of Trump's address and tore up the transcript of his speech"
-    # print(sent)
-    # out = nltk_sentiment_analysis(sent)
-    # print(out)
-    #
-    # print('\n\nNeutral example:')
-    # sent = "This is a neutral sentence and this is a statement of fact"
-    # print(sent)
-    # out = nltk_sentiment_analysis(sent)
-    # print(out)
+    run_sentiment_analysis(fox, num_sentences=3)
 
 
