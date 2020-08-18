@@ -1,5 +1,4 @@
 from textblob import TextBlob
-from nltk.sentiment.util import demo_sent_subjectivity
 
 from common import sentence_tokenizer
 
@@ -44,6 +43,7 @@ def textblob_topn_subjectivity(text, num_sentences=3):
 
 def nltk_subjectivity_analysis(text):
     # TODO
+    # from nltk.sentiment.util import demo_sent_subjectivity
     raise NotImplementedError
 
 
