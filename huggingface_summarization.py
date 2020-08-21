@@ -74,19 +74,24 @@ if __name__ == "__main__":
 
     import time
 
+    from statistical_summarize import run_tf_idf_summarization, run_word_frequency_summarization
+
+    summary_tf = run_tf_idf_summarization(article, 10)
+    summary_wf = run_word_frequency_summarization(article, 10)
+
     for model in models:
 
         a = time.time()
-        summary = pegasus_summarization(article, model_name=model)
+        summary = pegasus_summarization(summary_tf, model_name=model)
         b = time.time()
 
-        print(f'\n\n\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary, article)}\nTime {b-a}s\nFull Text Summary: {summary}')
+        print(f'\n\n\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary, article)}\nTime {b-a}s\nTF IDF Summary: {summary}')
 
         a = time.time()
-        summary = pegasus_paragraph_by_paragraph_summary(article, model_name=model)
+        summary = pegasus_paragraph_by_paragraph_summary(summary_wf, model_name=model)
         b = time.time()
 
-        print(f'\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary, article)}\nTime {b-a}s\nParagraph by Paragraph Summary: {summary}')
+        print(f'\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary, article)}\nTime {b-a}s\nWord Frequency Summary: {summary}')
 
 
 

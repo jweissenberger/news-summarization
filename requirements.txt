@@ -6,6 +6,9 @@ flair
 gensim
 sentencepiece
 tfds-nightly
-#tensorflow-gpu==2.2.0
-tensorflow==2.2.0
+torch
+tensorflow
+transformers
 jupyterlab
+flask
+flask_bootstrap

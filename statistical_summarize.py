@@ -245,7 +245,7 @@ if __name__ == '__main__':
 
     # TODO create a clean text function that removes * and such
 
-    file = open("cnn.txt", "r")
+    file = open("fox.txt", "r")
     article = file.read()
     file.close()
 
