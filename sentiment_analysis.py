@@ -257,6 +257,6 @@ if __name__ == '__main__':
     fox = file.read()
     file.close()
 
-    print(hf_topn_sentiment(fox, num_sentences=3))
+    run_sentiment_analysis(fox, num_sentences=3)
 
 
