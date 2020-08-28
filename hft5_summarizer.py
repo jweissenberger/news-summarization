@@ -2,6 +2,7 @@ import torch
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 import math
 from common import sentence_tokenizer
+from statistical_summarize import run_tf_idf_summarization, run_word_frequency_summarization
 
 
 def summarize_t5(text, size='small'):
@@ -53,7 +54,12 @@ def chunk_summarize_t5(text, size='small'):
     if tokenized_text.shape[1] < 500:
         return summarize_t5(text, size=size)
 
-    num_chunks = math.ceil(tokenized_text.shape[1]/500)
+    if size == 'small':
+        max_size = 200
+    else:
+        max_size = 400
+
+    num_chunks = math.ceil(tokenized_text.shape[1]/max_size)
 
     sentences = sentence_tokenizer(text)
 
@@ -62,6 +68,29 @@ def chunk_summarize_t5(text, size='small'):
         output += summarize_t5(j, size=size) + ' '
 
     return output
+
+
+def tfidf_summarize_t5(text, size='small'):
+
+    sentences = sentence_tokenizer(text)
+
+    if len(sentences) < 15:
+        return "Article is too small for this technique"
+
+    summary = run_tf_idf_summarization(text, num_sentences=10)
+
+    return summarize_t5(summary, size=size)
+
+
+def word_frequency_summarize_t5(text, size='small'):
+    sentences = sentence_tokenizer(text)
+
+    if len(sentences) < 15:
+        return "Article is too small for this technique"
+
+    summary = run_word_frequency_summarization(text, num_sentences=10)
+
+    return summarize_t5(summary, size=size)
 
 
 def chunks(l, n):
@@ -78,5 +107,12 @@ if __name__ == '__main__':
     text = file.read()
     file.close()
 
-    print('\n\n\n', chunk_summarize_t5(text, size='large'))
+    print('\n\n\nLarge:\n', chunk_summarize_t5(text, size='large'), '\n\n\n')
+    print('\n\n\nSmall:\n', chunk_summarize_t5(text, size='small'), '\n\n\n')
+    print('\n\n\nLarge TFIDF:\n', tfidf_summarize_t5(text, size='large'), '\n\n\n')
+    print('\n\n\nSmall TFIDF:\n', tfidf_summarize_t5(text, size='small'), '\n\n\n')
+    print('\n\n\nLarge WF:\n', word_frequency_summarize_t5(text, size='large'), '\n\n\n')
+    print('\n\n\nSmall WF:\n', word_frequency_summarize_t5(text, size='small'), '\n\n\n')
+
+
 
