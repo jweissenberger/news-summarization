@@ -44,13 +44,13 @@ def summarize_t5(text, size='small'):
 
 def chunk_summarize_t5(text, size='small'):
 
-
     preprocess_text = text.strip().replace("\n", "")
     t5_prepared_Text = "summarize: " + preprocess_text
     device = torch.device('cpu')
     tokenizer = T5Tokenizer.from_pretrained(f't5-{size}')
     tokenized_text = tokenizer.encode(t5_prepared_Text, return_tensors="pt").to(device)
 
+    # if there are over 500 tokens chunk it up
     if tokenized_text.shape[1] < 500:
         return summarize_t5(text, size=size)
 

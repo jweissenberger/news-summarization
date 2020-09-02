@@ -70,7 +70,8 @@ if __name__ == "__main__":
     article = file.read()
     file.close()
 
-    models = ['google/pegasus-xsum', 'google/pegasus-newsroom', 'google/pegasus-reddit_tifu', 'google/pegasus-wikihow']
+    models = ['google/pegasus-xsum', 'google/pegasus-newsroom', 'google/pegasus-cnn_dailymail',
+              'google/pegasus-multi_news', 'google/pegasus-gigaword']
 
     import time
 
@@ -80,18 +81,27 @@ if __name__ == "__main__":
     summary_wf = run_word_frequency_summarization(article, 10)
 
     for model in models:
-
-        a = time.time()
-        summary = pegasus_summarization(summary_tf, model_name=model)
-        b = time.time()
-
-        print(f'\n\n\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary, article)}\nTime {b-a}s\nTF IDF Summary: {summary}')
-
-        a = time.time()
-        summary = pegasus_paragraph_by_paragraph_summary(summary_wf, model_name=model)
-        b = time.time()
-
-        print(f'\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary, article)}\nTime {b-a}s\nWord Frequency Summary: {summary}')
+        summary = pegasus_paragraph_by_paragraph_summary(article, model)
+        print('\n\nModel:', model)
+        print('Extracted phrases:', check_plagiarism())
+        print(pegasus_paragraph_by_paragraph_summary(article, model))
+        # a = time.time()
+        # summary = pegasus_summarization(article, model_name=model)
+        # b = time.time()
+        #
+        # print(f'\n\n\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary,article)}\nTime {b - a}s\nSummary: {summary}')
+        #
+        # a = time.time()
+        # summary = pegasus_summarization(summary_tf, model_name=model)
+        # b = time.time()
+        #
+        # print(f'\n\n\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary, article)}\nTime {b-a}s\nTF IDF Summary: {summary}')
+        #
+        # a = time.time()
+        # summary = pegasus_paragraph_by_paragraph_summary(summary_wf, model_name=model)
+        # b = time.time()
+        #
+        # print(f'\nModel: {model}\nExtracted phrases found: {check_plagiarism(summary, article)}\nTime {b-a}s\nWord Frequency Summary: {summary}\n\n')
 
 
 
