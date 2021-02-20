@@ -41,12 +41,6 @@ def textblob_topn_subjectivity(text, num_sentences=3):
     return most_subjective, least_subjective
 
 
-def nltk_subjectivity_analysis(text):
-    # TODO
-    # from nltk.sentiment.util import demo_sent_subjectivity
-    raise NotImplementedError
-
-
 def run_subjectivity(text, num_sentences=3):
 
     print("******************Full Subjectivity Analysis******************\n\n")

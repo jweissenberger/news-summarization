@@ -1,14 +1,6 @@
-selenium
-nltk
-textblob
-numpy
-flair
-gensim
-sentencepiece
+newspaper3k
 tfds-nightly
 torch
-tensorflow
 transformers
-jupyterlab
-flask
-flask_bootstrap
+nltk
+textblob
