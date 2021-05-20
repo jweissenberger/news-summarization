@@ -17,10 +17,10 @@ from hf_summarizer import bart_summarize
 summary = bart_summarize(article['article'])
 
 print(summary)
-" Democratic presidential candidate Joe Biden has put forth several proposals that would change the tax code. 
+>>> """Democratic presidential candidate Joe Biden has put forth several proposals that would change the tax code. 
 He's proposing to raise taxes on the wealthy and on corporations by reversing some of the Republican-backed tax cuts 
 signed into law in 2017. It's unlikely that Biden's campaign plans would come to fruition just as he's proposed them, 
-even if he wins the election."
+even if he wins the election."""
 
 ```
 
