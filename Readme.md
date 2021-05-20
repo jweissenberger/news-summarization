@@ -9,7 +9,7 @@ to see how it works
 
 `python models_download.py` # this is to download the necessary huggingface models and nltk datasets
 
-```
+```python
 from scraping import return_single_article
 article = return_single_article('https://www.cnn.com/2020/10/20/politics/joe-biden-tax-plan/index.html')
 
